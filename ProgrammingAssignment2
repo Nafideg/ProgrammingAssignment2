@@ -1,0 +1,75 @@
+#Programming Assignment 2: Lexical Scoping
+#Here is an implementation of the makeCacheMatrix and cacheSolve functions that handles the case where the matrix may not be invertible:
+makeCacheMatrix <- function(x = matrix()) {
+  inv <- NULL
+  changed <- FALSE
+  set <- function(y) {
+    x <<- y
+    inv <<- NULL
+    changed <<- TRUE
+  }
+  get <- function() x
+  setinverse <- function(inverse) inv <<- inverse
+  getinverse <- function() inv
+  list(set = set, get = get, setinverse = setinverse, getinverse = getinverse, changed = changed)
+}
+
+cacheSolve <- function(x, ...) {
+  inv <- x$getinverse()
+  if (!is.null(inv) && !x$changed) {
+    message("getting cached data")
+    return(inv)
+  }
+  data <- x$get()
+  if (isSingular(data)) {
+    message("matrix is singular, cannot compute inverse")
+    return(NULL)
+  }
+  inv <- solve(data, ...)
+  x$setinverse(inv)
+  x$changed <- FALSE
+  inv
+}
+#to test these functions, you can create a matrix and use it to create a cache matrix object:
+
+
+matrix <- matrix(c(1, 2, 3, 4), nrow = 2)
+cache <- makeCacheMatrix(matrix)
+#Then, you can use the cacheSolve function to compute the inverse of the matrix and store it in the cache:
+  
+inverse <- cacheSolve(cache)
+
+
+#Here is an implementation of the makeCacheMatrix and cacheSolve functions that assumes that the matrix supplied is always invertible:
+makeCacheMatrix <- function(x = matrix()) {
+  inv <- NULL
+  set <- function(y) {
+    x <<- y
+    inv <<- NULL
+  }
+  get <- function() x
+  setinverse <- function(inverse) inv <<- inverse
+  getinverse <- function() inv
+  list(set = set, get = get, setinverse = setinverse, getinverse = getinverse)
+}
+
+cacheSolve <- function(x, ...) {
+  inv <- x$getinverse()
+  if (!is.null(inv)) {
+    message("getting cached data")
+    return(inv)
+  }
+  data <- x$get()
+  inv <- solve(data, ...)
+  x$setinverse(inv)
+  inv
+}
+#to test these functions, we can create a matrix and use it to create a cache matrix object:
+matrix <- matrix(c(1, 2, 3, 4), nrow = 2)
+cache <- makeCacheMatrix(matrix)
+#Then, we can use the cacheSolve function to compute the inverse of the matrix and store it in the cache:
+inverse <- cacheSolve(cache)
+#we can also retrieve the inverse from the cache using the getinverse function:
+
+inverse <- cache$getinverse()
+
